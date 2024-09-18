@@ -1,0 +1,13 @@
+Tasks-list = 📒 Tasks list
+task_details_title = 📌 Title: {$title}
+task_details_description = ✏️ Description: {$description}
+task_details_categories = 🗂 Categories: {$categories}
+task_details_created_date = 📅 Created: {$created_date}
+task_details_due_date = ⏰ Deadline: {$due_date}
+Back = 🔙 Back
+Close-Task = 🔒 Close Task
+Enter-Title = 🖋️ Enter task title:
+Enter-Description = 📖 Enter task description:
+Enter-Category = 🗂️ Enter task categories (comma separated):
+Enter-Deadline = ⏰ Enter Deadline
+Save = ✔️ Save

@@ -1,0 +1,13 @@
+Tasks-list = 📒 Список задач
+task_details_title = 📌 Заголовок: {$title}
+task_details_description = ✏️ Описание: {$description}
+task_details_categories = 🗂 Категории: {$categories}
+task_details_created_date = 📅 Создано: {$created_date}
+task_details_due_date = ⏰ Дедлайн: {$due_date}
+Back = 🔙 Назад
+Close-Task = 🔒 Закрыть задачу
+Enter-Title = 🖋️ Введите заголовок задачи:
+Enter-Description = 📖 Введите описание задачи:
+Enter-Category = 🗂️ Введите категории задачи (разделяя запятой):
+Enter-Deadline = ⏰ Введите дедлайн
+Save = ✔️ Сохранить
