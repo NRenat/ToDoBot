@@ -24,6 +24,11 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+Создать пользователя, через которого бот будет получать токен (данные пользователя необходимо ввести в .env)
+```
+python manage.py createsuperuser
+```
+
 Запустить телеграм бота
 ```
 python bot/run.py
