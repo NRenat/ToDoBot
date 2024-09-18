@@ -4,7 +4,6 @@ import os.path
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
-from aiogram.types import BotCommand
 from dotenv import load_dotenv
 from fluent.runtime import FluentLocalization, FluentResourceLoader
 
@@ -39,21 +38,11 @@ def make_i18n_middleware():
     return I18nMiddleware(l10ns, DEFAULT_LOCALE)
 
 
-async def set_command(bot: Bot):
-    commands = [
-        BotCommand(command="start", description="Starts the bot"),
-        BotCommand(command='new', description="Creates a new task"),
-        BotCommand(command='menu', description='Open a bot menu')
-    ]
-    await bot.set_my_commands(commands)
-
-
-async def on_startup(dispatcher):
+async def on_startup():
     logging.info('Starting authentication')
     await api_service.authenticate(username=os.getenv('BOT_BACK_USER'),
                                    password=os.getenv('BOT_BACK_PASS'))
     logging.info('Authentication complete')
-    await set_command(dispatcher.bot)
     logging.info('Commands set')
 
 
@@ -71,8 +60,9 @@ async def main():
     dp.include_router(menu_dialog)
     dp.message.register(start, CommandStart())
     setup_dialogs(dp)
+    await on_startup()
 
-    await dp.start_polling(bot, on_startup=on_startup)
+    await dp.start_polling(bot,)
 
 
 if __name__ == '__main__':
