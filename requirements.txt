@@ -9,3 +9,4 @@ aiogram_dialog~=2.2.0
 requests~=2.32.3
 djangorestframework-simplejwt
 drf-spectacular
+fluent.runtime
