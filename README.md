@@ -34,7 +34,7 @@ python manage.py createsuperuser
 python bot/run.py
 ```
 
-После команды /start в телеграм боте, вы можете добавить тестовые данные с [jsonplaceholder](jsonplaceholder.typicode.com/) командой
+После команды /start в телеграм боте, когда пользователи будут добавлены на сервер, вы можете добавить тестовые данные с [jsonplaceholder](jsonplaceholder.typicode.com/) командой
 ```
 python manage.py generate_random_tasks
 ```
