@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, date
 from typing import Any
 
 from aiogram.types import CallbackQuery, Message
@@ -29,7 +29,7 @@ async def get_task_review_data(dialog_manager: DialogManager, **kwargs):
         "categories": data.get('categories', 'N/A')})
     due_date = l10ns.format_value(
         "task_details_due_date",
-        {'due_date': data.get('due_date', 'N/A')['current_offset']}
+        {'due_date': data.get('deadline', 'N/A')}
     )
 
     formatted_text = (
@@ -46,7 +46,7 @@ async def on_save_task(callback: CallbackQuery, button: Button, manager: DialogM
         "title": data.get("title"),
         "description": data.get("description"),
         "categories": data.get("categories").strip().split(','),
-        "due_date": data.get("due_date")['current_offset'],
+        "due_date": data.get("deadline"),
         'author': manager.event.from_user.id,
     }
     await api_service.create_task(task_data)
@@ -101,6 +101,13 @@ async def get_task_data(dialog_manager: DialogManager, **kwargs):
     }
 
 
+async def on_date_selected(callback: CallbackQuery, widget,
+                           manager: DialogManager, selected_date: date):
+    data = manager.current_context().widget_data
+    data['deadline'] = str(selected_date)
+    await manager.switch_to(CreateTaskSG.confirm)
+
+
 async def close_task(callback: CallbackQuery, button: Button, manager: DialogManager, ):
     task_id = manager.current_context().start_data.get("task_id")
     await api_service.close_task(task_id)
@@ -127,7 +134,7 @@ create_dialog = Dialog(
         I18NFormat("Enter-Deadline:"),
         Calendar(
             id='due_date',
-            on_click=Next(),
+            on_click=on_date_selected,
         ),
         state=CreateTaskSG.due_date
     ),
