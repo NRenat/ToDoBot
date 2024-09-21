@@ -43,3 +43,14 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    id = ULIDField(primary_key=True, default=ULID, editable=False)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="comments",
+                             verbose_name="Task")
+    text = models.TextField(verbose_name="Comment Text")
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Created Date")
+
+    def __str__(self):
+        return self.text[:30]

@@ -20,3 +20,9 @@ class UserFromTelegramAdmin(admin.ModelAdmin):
     list_display = ('telegram_id',)
     list_filter = ('telegram_id',)
     search_fields = ('telegram_id',)
+
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('text',)
+    list_filter = ('text',)
+    search_fields = ('text',)

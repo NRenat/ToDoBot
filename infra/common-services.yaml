@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: db
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    expose:
+      - "5432"
+    env_file:
+      - ../.env
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U $${DB_USER} -d $${DB_NAME}'" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ..
+      dockerfile: /src/backend/Dockerfile
+    image: nrenat/todo_bot_backend:lastest
+    container_name: backend
+    restart: always
+    volumes:
+      - static:/app/static/
+    command: >
+      bash -c "python manage.py migrate &&
+               python manage.py collectstatic --clear --noinput &&
+               gunicorn ToDoBot.wsgi:application --bind 0:8000"
+    expose:
+      - "8000"
+    env_file:
+      - ../.env
+
+  bot:
+    build:
+      context: ..
+      dockerfile: /src/bot/Dockerfile
+    image: nrenat/todo_bot:lastest
+    container_name: bot
+    restart: always
+    command: bash -c "python run.py"
+    volumes:
+      - ../.data/logs/:/.data/logs/
+    env_file:
+      - ../.env
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - static:/var/html/static/
+      - media:/var/html/media/
+    env_file:
+      - ../.env

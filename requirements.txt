@@ -10,3 +10,5 @@ requests~=2.32.3
 djangorestframework-simplejwt
 drf-spectacular
 fluent.runtime
+psycopg2-binary
+gunicorn

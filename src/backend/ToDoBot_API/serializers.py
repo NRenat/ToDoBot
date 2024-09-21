@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ToDoBot_API.models import UserFromTelegram, Category, Task
+from ToDoBot_API.models import UserFromTelegram, Category, Task, Comment
 
 
 class UserFromTelegramSerializer(serializers.ModelSerializer):
@@ -46,3 +46,11 @@ class TaskSerializer(serializers.ModelSerializer):
             category, created = Category.objects.get_or_create(name=category_name)
             category_objects.append(category)
         task.categories.set(category_objects)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = ('id', 'text', 'created_date')
+

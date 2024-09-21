@@ -4,6 +4,7 @@ import os.path
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart
+from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
 from fluent.runtime import FluentLocalization, FluentResourceLoader
 
@@ -38,18 +39,11 @@ def make_i18n_middleware():
     return I18nMiddleware(l10ns, DEFAULT_LOCALE)
 
 
-async def on_startup():
-    logging.info('Starting authentication')
-    await api_service.authenticate(username=os.getenv('BOT_BACK_USER'),
-                                   password=os.getenv('BOT_BACK_PASS'))
-    logging.info('Authentication complete')
-    logging.info('Commands set')
-
-
 async def main():
     logging.basicConfig(level=logging.INFO)
     bot = Bot(token=os.getenv("TG_TOKEN"))
-    dp = Dispatcher()
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
 
     i18n_middleware = make_i18n_middleware()
     dp.message.middleware(i18n_middleware)
@@ -60,9 +54,8 @@ async def main():
     dp.include_router(menu_dialog)
     dp.message.register(start, CommandStart())
     setup_dialogs(dp)
-    await on_startup()
 
-    await dp.start_polling(bot,)
+    await dp.start_polling(bot, )
 
 
 if __name__ == '__main__':

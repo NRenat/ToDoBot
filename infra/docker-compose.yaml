@@ -1,0 +1,33 @@
+services:
+  db:
+    extends:
+      file: common-services.yaml
+      service: db
+
+  backend:
+    extends:
+      file: common-services.yaml
+      service: backend
+    depends_on:
+      db:
+        condition: service_healthy
+
+  bot:
+    extends:
+      file: common-services.yaml
+      service: bot
+    depends_on:
+      - backend
+
+  nginx:
+    extends:
+      file: common-services.yaml
+      service: nginx
+    depends_on:
+      - bot
+      - backend
+
+volumes:
+  static:
+  media:
+  db_data:

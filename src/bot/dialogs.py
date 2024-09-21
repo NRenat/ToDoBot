@@ -2,9 +2,9 @@ import os
 from datetime import datetime
 from typing import Any
 
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from aiogram_dialog import Dialog, Window, DialogManager
-from aiogram_dialog.widgets.input import TextInput
+from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.kbd import (
     Next, Calendar, Row, Button, ScrollingGroup, Select
 )
@@ -45,48 +45,13 @@ async def on_save_task(callback: CallbackQuery, button: Button, manager: DialogM
     task_data = {
         "title": data.get("title"),
         "description": data.get("description"),
-        "categories": data.get("categories").split(', '),
+        "categories": data.get("categories").strip().split(','),
         "due_date": data.get("due_date")['current_offset'],
         'author': manager.event.from_user.id,
     }
     await api_service.create_task(task_data)
     await callback.message.answer("Task created successfully!")
     await manager.done()
-
-
-create_dialog = Dialog(
-    Window(
-        I18NFormat("Enter-Title"),
-        TextInput(id="title", on_success=Next()),
-        state=CreateTaskSG.title,
-    ),
-    Window(
-        I18NFormat("Enter-Description"),
-        TextInput(id="description", on_success=Next()),
-        state=CreateTaskSG.description,
-    ),
-    Window(
-        I18NFormat("Enter-Category"),
-        TextInput(id="categories", on_success=Next()),
-        state=CreateTaskSG.categories,
-    ),
-    Window(
-        I18NFormat("Enter-Deadline:"),
-        Calendar(
-            id='due_date',
-            on_click=Next(),
-        ),
-        state=CreateTaskSG.due_date
-    ),
-    Window(
-        I18NFormat("{task_details}").text,
-        Row(
-            Button(I18NFormat("Save"), id="save_task", on_click=on_save_task),
-        ),
-        state=CreateTaskSG.confirm,
-        getter=get_task_review_data
-    ),
-)
 
 
 async def get_data(dialog_manager: DialogManager, **kwargs):
@@ -142,6 +107,92 @@ async def close_task(callback: CallbackQuery, button: Button, manager: DialogMan
     await manager.done()
 
 
+create_dialog = Dialog(
+    Window(
+        I18NFormat("Enter-Title"),
+        TextInput(id="title", on_success=Next()),
+        state=CreateTaskSG.title,
+    ),
+    Window(
+        I18NFormat("Enter-Description"),
+        TextInput(id="description", on_success=Next()),
+        state=CreateTaskSG.description,
+    ),
+    Window(
+        I18NFormat("Enter-Category"),
+        TextInput(id="categories", on_success=Next()),
+        state=CreateTaskSG.categories,
+    ),
+    Window(
+        I18NFormat("Enter-Deadline:"),
+        Calendar(
+            id='due_date',
+            on_click=Next(),
+        ),
+        state=CreateTaskSG.due_date
+    ),
+    Window(
+        I18NFormat("{task_details}").text,
+        Row(
+            Button(I18NFormat("Save"), id="save_task", on_click=on_save_task),
+        ),
+        state=CreateTaskSG.confirm,
+        getter=get_task_review_data
+    ),
+)
+
+
+async def get_comments_data(dialog_manager: DialogManager, **kwargs):
+    task_id = dialog_manager.current_context().start_data.get("task_id")
+    raw_comments = await api_service.get_comments(
+        task_id)
+    if raw_comments:
+        comments = [
+            {**comment, 'text': comment['text'][:30] + '...'} if len(
+                comment['text']) > 30 else comment
+            for comment in raw_comments
+        ]
+    else:
+        comments = []
+    return {
+        "comments": comments
+    }
+
+
+async def delete_comment(callback: CallbackQuery, widget: Any, manager: DialogManager):
+    comment_id = manager.dialog_data['comment_id']
+    task_id = manager.start_data['task_id']
+    await api_service.delete_comment(task_id, comment_id)
+
+    await callback.message.answer("Comment has been deleted.")
+    await manager.switch_to(
+        DialogSG.view_comments)
+
+
+async def get_comment_data(dialog_manager: DialogManager, **kwargs):
+    task_id = dialog_manager.start_data['task_id']
+    comment_id = dialog_manager.dialog_data['comment_id']
+    comment = await api_service.get_comment(task_id,
+                                            comment_id)
+    return {'comment-detail': comment["text"]}
+
+
+async def on_comment_selected(callback: CallbackQuery, widget: Any,
+                              manager: DialogManager, item_id: str):
+    manager.dialog_data['comment_id'] = item_id
+    await manager.switch_to(
+        DialogSG.view_comment)
+
+
+async def comment_handler(message: Message, message_input: MessageInput,
+                          manager: DialogManager):
+    context = manager.current_context()
+    task_id = context.start_data['task_id']
+    new_comment = message.text
+    await api_service.add_comment(task_id, new_comment)
+    await manager.switch_to(DialogSG.view_comments)
+
+
 menu_dialog = Dialog(
     Window(
         I18NFormat("Tasks-list"),
@@ -162,10 +213,57 @@ menu_dialog = Dialog(
     ),
     Window(
         I18NFormat("{task_details}").text,
-        Button(I18NFormat("Back"), id="back", on_click=lambda c, b, m: m.back()),
-        Button(I18NFormat('Close-Task'), id='close_task', on_click=close_task),
+        Row(
+            Button(I18NFormat("Back"), id="back", on_click=lambda c, b, m: m.back()),
+            Button(I18NFormat('Close-Task'), id='close_task', on_click=close_task),
+            Button(I18NFormat('Comments'), id='comments',
+                   on_click=lambda c, b, m: m.next()),
+        ),
         state=DialogSG.task_view,
         getter=get_task_data,
+    ),
+    Window(
+        I18NFormat("Comments:"),
+        ScrollingGroup(
+            Select(
+                Format("{item[text]}"),
+                id="comments_list",
+                items="comments",
+                item_id_getter=lambda x: x.get('id'),
+                on_click=on_comment_selected,
+            ),
+            id="comments_scroll",
+            width=1,
+            height=5,
+        ),
+        Row(
+            Button(I18NFormat("Back"), id="back_to_task",
+                   on_click=lambda c, b, m: m.back()),
+            Button(I18NFormat("Add-Comment"), id="add_comment",
+                   on_click=lambda c, b, m: m.next()),
+        ),
+        state=DialogSG.view_comments,
+        getter=get_comments_data,
+    ),
+    Window(
+        I18NFormat("Enter-Comment"),
+        MessageInput(comment_handler, ),
+        Row(
+            Button(I18NFormat("Back"), id="back_to_comments",
+                   on_click=lambda c, b, m: m.back()),
+        ),
+        state=DialogSG.add_comment,
+    ),
+    Window(
+        Format("{comment-detail}"),
+        TextInput(id="view_comment"),
+        Row(
+            Button(I18NFormat("Back"), id="back_to_comments",
+                   on_click=lambda c, b, m: m.back()),
+            Button(I18NFormat("Delete"), id="delete_comment", on_click=delete_comment),
+        ),
+        state=DialogSG.view_comment,
+        getter=get_comment_data,
     ),
 )
 

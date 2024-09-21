@@ -1,5 +1,5 @@
 import django_filters
-from .models import Task
+from ToDoBot_API.models import Task
 
 
 class TaskFilter(django_filters.FilterSet):

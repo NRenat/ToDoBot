@@ -41,6 +41,15 @@ python manage.py generate_random_tasks
 
 Документация по api доступна по [ссылке](http://127.0.0.1:8000/api/schema/redoc/) или в [файле](redoc.yaml) проекта.
 
+Или запустить Docker
+```
+docker compose -f docker-compose.yaml up -d
+```
+И создать там пользователя для бота
+```
+docker exec -it backend python manage.py createsuperuser
+```
+
 ## Описание архитектуры
 <dl>
 <dt>1. Telegram Bot (aiogram + aiogram dialog)</dt>
@@ -53,8 +62,8 @@ python manage.py generate_random_tasks
 <dd>* Предоставление RESTful API для выполнения CRUD операций над данными.</dd>
 </dl>
 <dl>
-<dt>3. БД (sqlite3 or postgresql)</dt>
-<dd>При разработке в режиме отладки используется sqlite3, в прод используется postgresql как более производительная СУБД.</dd>
+<dt>3. БД (postgresql)</dt>
+<dd> В проекте используется современная, производительная и распространенная СУБД</dd>
 </dl>
 
 
@@ -73,3 +82,12 @@ python manage.py generate_random_tasks
 * Добавить комментарии к задачам
 * Упаковать в Docker контейнеры
 * Настроить уведомления для пользователей об их задачах
+
+## Технологии
+* Python 3.12
+* Django
+* DRF
+* PostgeSQL
+* Aiogram
+* Aiogram-dialog
+* Docker
