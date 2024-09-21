@@ -70,12 +70,9 @@ class APIService:
     async def _post_request(self, url: str, data: dict) -> Response:
         headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
         async with AsyncClient() as client:
-            print('first----------------------------------', f'{self.base_url, url, data, headers}')
             response = await client.post(urljoin(base=self.base_url, url=url),
                                          json=data, headers=headers)
-            print(response)
             if response.status_code == 401:
-                print('second--------------------------------------')
                 await self._authenticate()
                 headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
                 response = await client.post(urljoin(base=self.base_url, url=url),
