@@ -31,7 +31,7 @@ python manage.py createsuperuser
 
 Запустить телеграм бота
 ```
-python bot/run.py
+python run.py
 ```
 
 После команды /start в телеграм боте, когда пользователи будут добавлены на сервер, вы можете добавить тестовые данные с [jsonplaceholder](jsonplaceholder.typicode.com/) командой
