@@ -15,41 +15,40 @@ class APIService:
     async def create_user(self, tg_id):
         data = {"telegram_id": tg_id}
         response = await self._post_request('users/', data)
-        return response.json()
+        return response
 
     async def close_task(self, task_id):
         data = {
             'completed': True
         }
         response = await self._patch_request(f'tasks/{task_id}/', data)
-        return response.json()
+        return response
 
     async def get_task_details(self, task_id: str):
         response = await self._get_request(f'tasks/?id={task_id}')
-        print(response.json())
-        return response.json()[0]
+        return response
 
     async def get_tasks(self, telegram_id: str):
         response = await self._get_request(
             f'tasks/?author={telegram_id}&completed=False')
-        return response.json()
+        return response
 
     async def create_task(self, task: dict):
         response = await self._post_request('tasks/', task)
-        return response.json()
+        return response
 
     async def get_comments(self, task_id: str):
         response = await self._get_request(f'tasks/{task_id}/comments/')
-        return response.json()
+        return response
 
     async def get_comment(self, task_id: str, comment_id: str):
         response = await self._get_request(f'tasks/{task_id}/comments/{comment_id}/')
-        return response.json()
+        return response
 
     async def add_comment(self, task_id: str, comment: str):
         response = await self._post_request(f'tasks/{task_id}/comments/',
                                             {'text': comment})
-        return response.json()
+        return response
 
     async def delete_comment(self, task_id: str, comment_id: str):
         response = await self._delete_request(f'tasks/{task_id}/comments/{comment_id}/')
@@ -62,7 +61,8 @@ class APIService:
                                         headers=headers)
             if response.status_code == 401:
                 await self._authenticate()
-                headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+                headers = {
+                    "Authorization": f"Bearer {self.token}"} if self.token else {}
                 response = await client.get(urljoin(base=self.base_url, url=url),
                                             headers=headers)
             return response
@@ -74,7 +74,8 @@ class APIService:
                                          json=data, headers=headers)
             if response.status_code == 401:
                 await self._authenticate()
-                headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+                headers = {
+                    "Authorization": f"Bearer {self.token}"} if self.token else {}
                 response = await client.post(urljoin(base=self.base_url, url=url),
                                              json=data, headers=headers)
             return response
@@ -86,7 +87,8 @@ class APIService:
                                           json=data, headers=headers)
             if response.status_code == 401:
                 await self._authenticate()
-                headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+                headers = {
+                    "Authorization": f"Bearer {self.token}"} if self.token else {}
                 response = await client.patch(urljoin(base=self.base_url, url=url),
                                               json=data, headers=headers)
             return response
@@ -98,7 +100,8 @@ class APIService:
                                            headers=headers)
             if response.status_code == 401:
                 await self._authenticate()
-                headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+                headers = {
+                    "Authorization": f"Bearer {self.token}"} if self.token else {}
                 response = await client.delete(urljoin(base=self.base_url, url=url),
                                                headers=headers)
             return response

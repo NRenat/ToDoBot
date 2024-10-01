@@ -16,23 +16,21 @@ from aiogram_dialog import (
     setup_dialogs
 )
 
-from internal_requests.service import api_service
-
 load_dotenv()
 
-DEFAULT_LOCALE = "en"
-LOCALES = ["en", 'ru']
+DEFAULT_LOCALE = 'en'
+LOCALES = ['en', 'ru']
 
 
 def make_i18n_middleware():
     loader = FluentResourceLoader(os.path.join(
         os.path.dirname(__file__),
-        "translations",
-        "{locale}",
+        'translations',
+        '{locale}',
     ))
     l10ns = {
         locale: FluentLocalization(
-            [locale, DEFAULT_LOCALE], ["main.ftl"], loader,
+            [locale, DEFAULT_LOCALE], ['main.ftl'], loader,
         )
         for locale in LOCALES
     }
@@ -41,7 +39,7 @@ def make_i18n_middleware():
 
 async def main():
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(token=os.getenv("TG_TOKEN"))
+    bot = Bot(token=os.getenv('TG_TOKEN'))
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
 

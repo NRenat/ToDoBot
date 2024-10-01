@@ -4,7 +4,7 @@ from aiogram_dialog.api.protocols import DialogManager
 from aiogram_dialog.widgets.common import WhenCondition
 from aiogram_dialog.widgets.text import Text
 
-I18N_FORMAT_KEY = "aiogd_i18n_format"
+I18N_FORMAT_KEY = 'aiogd_i18n_format'
 
 
 class Values(Protocol):

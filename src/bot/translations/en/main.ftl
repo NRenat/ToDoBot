@@ -16,3 +16,7 @@ Add-Comment = ✏️ Add Comment
 Comments = 📒 Comments
 Comments: = 📒 Comments:
 Delete = 🗑️ Delete
+smth_wrong_text = Something went wrong. Try again later or contact the administrator. 😓
+created-task = ✨ Task created successfully! ✨
+deleted-comment = 🔥 The comment has been deleted!
+welcome-text = ⚡ Welcome to the bot! Use /menu to view tasks. /new to create a new task!
